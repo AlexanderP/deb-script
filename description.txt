@@ -1,0 +1,6 @@
+eiskaltdcpp: cross-platform program that uses the Direct Connect and ADC protocols
+eiskaltdcpp-unstable: cross-platform program that uses the Direct Connect and ADC protocols
+gimp: The Free & Open Source Image Editor
+tesseract-ocr: Open Source OCR Engine
+leechcraft: free open source cross-platform modular internet-client
+gimp-devel: The Free & Open Source Image Editor

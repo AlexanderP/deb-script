@@ -1,0 +1,6 @@
+tangogis	https://code.google.com/p/tangogis/
+pytyle	http://sourceforge.net/projects/pytyle/
+q4wine	https://github.com/brezerk/q4wine
+quneiform	https://github.com/uliss/quneiform
+yagf	http://sourceforge.net/projects/yagf-ocr/
+qcomicbook	http://qcomicbook.org/
