@@ -11,16 +11,16 @@ REPREPRO_DIR="/media/sdb5/reprepro"
 
 test -d $REPREPRO_DIR || error "Неверно задан путь до рабочей директории reprepro"
 
-DEBIAN_DISTRIB="wheezy jessie stretch sid "
-UBUNTU_DISTRIB="precise trusty xenial"
-PPA_UBUNTU="precise trusty wily xenial"
+DEBIAN_DISTRIB="wheezy jessie stretch buster sid "
+UBUNTU_DISTRIB="precise trusty xenial artful"
+PPA_UBUNTU="precise trusty wily xenial yakkety zesty"
 PPA_UBUNTU_DAY="precise trusty vivid wily"
 DISTRIB="${DEBIAN_DISTRIB} ${UBUNTU_DISTRIB}"
 
-PKG_NAME="aegisub autopano-sift-c balsa bmpanel2 clementine compizboxmenu cuneiform-linux \
-deadbeef eiskaltdcpp eiskaltdcpp-unstable fatrat geeknote gimp gimp-devel goaccess \
-kvirc launchy librecad linuxdcpp llpp muse myrulib obkey ocrfeeder psi-plus ppastats \
-psi-plus-l10n pytyle q4wine qcad qcomicbook qpxtool qt-box-editor quneiform rubyripper scantailor \
+PKG_NAME="aegisub audacity azpainter autopano-sift-c balsa bmpanel2 clementine compizboxmenu cuneiform-linux \
+deadbeef eiskaltdcpp eiskaltdcpp-unstable fatrat freecad freecad-daily gimp gimp-devel gimp-gtk3 gmic goaccess gscan2pdf keepassxc \
+kvirc launchy librecad linuxdcpp llpp muse mypaint myrulib obkey ocrfeeder ocrodjvu pinta psi-plus ppastats \
+psi-plus-l10n pytyle q4wine qcad qcomicbook qpxtool qt-box-editor quneiform rubyripper scantailor scantailor-advanced scantailor-universal \
 smplayer solvespace sz81 tesseract-ocr truecrypt uget vacuum veracrypt yagf znotes"
 
 OUT_DIR=$(pwd)/out
@@ -50,7 +50,7 @@ cat > $i << EOF
 <table align="right" >
     <tr>
         <td>
-            <a href=index_ru.html>RU</a>
+            <a href=index-old_ru.html>RU</a>
         </td>
         <td>
             <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
@@ -92,7 +92,7 @@ cat > $i << EOF
 <table align="right" >
     <tr>
         <td>
-            <a href="http://notesalexp.${NETORG}">EN</a>
+            <a href="https://notesalexp.${NETORG}/index-old.html">EN</a>
         </td>
         <td>
             <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
@@ -126,7 +126,7 @@ for i in $NET_INDEX $ORG_INDEX; do
 		NETORG=$(echo $i | sed 's/_.*//g' | sed 's/.*-//g')
 		l=$(echo "${j}" | sed 's/\(.\)/\u\1/')
 		echo "    Add this line for ${l}:" >> $i
-		echo "    <I>deb http://notesalexp.${NETORG}/debian/${j}/ ${j} main</I><DT>" >> $i
+		echo "    <I>deb https://notesalexp.${NETORG}/debian/${j}/ ${j} main</I><DT>" >> $i
 	done
 done
 
@@ -135,7 +135,7 @@ for i in $NET_INDEX_RU $ORG_INDEX_RU; do
 		NETORG=$(echo $i | sed 's/_.*//g' | sed 's/.*-//g')
 		l=$(echo "${j}" | sed 's/\(.\)/\u\1/')
 		echo "    Добавьте следующую строку для ${l}:" >> $i
-		echo "    <I>deb http://notesalexp.${NETORG}/debian/${j}/ ${j} main</I><DT>" >> $i
+		echo "    <I>deb https://notesalexp.${NETORG}/debian/${j}/ ${j} main</I><DT>" >> $i
 	done
 done
 
@@ -154,7 +154,9 @@ done
 for i in $NET_INDEX $ORG_INDEX; do
 NETORG=$(echo $i | sed 's/_.*//g' | sed 's/.*-//g')
 cat >> $i << EOF
-    <I>apt-get update && apt-get install notesalexp-keyring</I><FONT COLOR="#808080"> #to add gpg key</FONT><DT>
+    <I>apt-get install apt-transport-https</I><DT>
+    <I>apt-get update -oAcquire::AllowInsecureRepositories=true</I><DT>
+    <I>apt-get install notesalexp-keyring -oAcquire::AllowInsecureRepositories=true</I><FONT COLOR="#808080"> #to add gpg key</FONT><DT>
     <I>apt-get update</I> <FONT COLOR="#808080">#to update package list</FONT><DT>
     <I>apt-get install package</I><DT>
     <strong>Warning:</strong> Need to update the gpg-key.(2015-09-20)<DT>
@@ -166,7 +168,9 @@ done
 for i in $NET_INDEX_RU $ORG_INDEX_RU; do
 NETORG=$(echo $i | sed 's/_.*//g' | sed 's/.*-//g')
 cat >> $i << EOF
-    <I>apt-get update && apt-get install notesalexp-keyring</I><FONT COLOR="#808080"> #Добавьте gpg ключ</FONT><DT>
+    <I>apt-get install apt-transport-https</I><DT>
+    <I>apt-get update -oAcquire::AllowInsecureRepositories=true</I><DT>
+    <I>apt-get install notesalexp-keyring -oAcquire::AllowInsecureRepositories=true</I><FONT COLOR="#808080"> #Добавьте gpg ключ</FONT><DT>
     <I>apt-get update</I> <FONT COLOR="#808080">#Обновите список пакетов</FONT><DT>
     <I>apt-get install пакет</I><DT>
     <strong>Внимание:</strong> Необходимо обновить gpg ключ.(2015-09-20)<DT>
@@ -198,13 +202,13 @@ for i in $NET_INDEX $ORG_INDEX $NET_INDEX_RU $ORG_INDEX_RU; do
 	NETORG=$(echo $i | sed 's/_.*//g' | sed 's/.*-//g')
 	for j in $DEBIAN_DISTRIB; do
 	l=$(echo "${j}" | sed 's/\(.\)/\u\1/')
-echo "                <td> <a href=\"http://notesalexp.${NETORG}/${j}/\">Debian ${l}</a></td>" >> $i
+echo "                <td> <a href=\"https://notesalexp.${NETORG}/${j}/\">Debian ${l}</a></td>" >> $i
 	done
 	for j in $UBUNTU_DISTRIB; do
 	l=$(echo "${j}" | sed 's/\(.\)/\u\1/')
-echo "                <td> <a href=\"http://notesalexp.${NETORG}/${j}/\">Ubuntu ${l}</a></td>" >> $i
+echo "                <td> <a href=\"https://notesalexp.${NETORG}/${j}/\">Ubuntu ${l}</a></td>" >> $i
 	done
-	echo "                <td> <a href=\"http://notesalexp.${NETORG}/source/\">Source</a></td>" >> $i
+	echo "                <td> <a href=\"https://notesalexp.${NETORG}/source/\">Source</a></td>" >> $i
 	echo "            </tr>" >> $i
 done
 
@@ -240,17 +244,17 @@ for i in $NET_INDEX_TMP $ORG_INDEX_TMP; do
 		homepage
 		#echo "                <td> ${l} </td>" >> $i
 		case ${l} in
-			qcad|aegisub|kvirc*|clementine|deadbeef|goaccess|ppastats|gimp*|llpp|scantailor|solvespace|librecad)
-			UPVERSION=$(find ${REPREPRO_DIR} -name "${l}_*.deb" ! -name "*vivid*" ! -name "*utopic*" | sed 's/_a.*//g'| sed 's/_i.*//g' | sed 's/.*_//g'| sed 's/ppa.*//g' | rev | cut -c 3- | rev | sort -u | tac | sed 1q)
+			ocrodjvu|balsa|gscan2pdf|pinta|mypaint|freecad*|qcad|tesseract*|aegisub|kvirc*|clementine|deadbeef|goaccess|ppastats|gimp*|llpp|scantailor*|solvespace|librecad)
+			UPVERSION=$(find ${REPREPRO_DIR} -name "${l}_*.deb" ! -name "*wily*" ! -name "*utopic*" | sed 's/_a.*//g'| sed 's/_i.*//g' | sed 's/.*_//g'| sed 's/ppa.*//g' | rev | cut -c 3- | rev | sort -u | tac | sed 1q)
 			;;
 			*)
-			UPVERSION=$(find ${REPREPRO_DIR} -name "${l}_*.deb" ! -name "*vivid*" ! -name "*utopic*" | sed 's/_a.*//g'| sed 's/_i.*//g' | sed 's/.*_//g' | sed 's/-.*//g' | sort -u | tac | sed 1q)
+			UPVERSION=$(find ${REPREPRO_DIR} -name "${l}_*.deb" ! -name "*wily*" ! -name "*utopic*" | sed 's/_a.*//g'| sed 's/_i.*//g' | sed 's/.*_//g' | sed 's/-.*//g' | sort -u | tac | sed 1q)
 			;;
 		esac
 		for j in $DISTRIB; do
 			PACKAGE=$(find ${REPREPRO_DIR}/${j} -name "${l}_*.deb" | sort -r |sed 1q)
 			case ${l} in
-				qcad|aegisub|kvirc*|clementine|deadbeef|goaccess|ppastats|gimp*|llpp|scantailor|solvespace|librecad)
+				ocrodjvu|balsa|gscan2pdf|pinta|mypaint|freecad*|qcad|tesseract*|aegisub|kvirc*|clementine|deadbeef|goaccess|ppastats|gimp*|llpp|scantailor*|solvespace|librecad)
 				VERSION=$(echo ${PACKAGE} | sed 's/_a.*//g'| sed 's/_i.*//g' | sed 's/.*_//g'| sed 's/ppa.*//g' | rev | cut -c 3- | rev)
 				;;
 				*)
@@ -264,9 +268,9 @@ for i in $NET_INDEX_TMP $ORG_INDEX_TMP; do
 				else
 					if [ ! -z "$(echo $VERSION | grep $UPVERSION)" ]
 					then
-					echo "                <td><a href=\"http://notesalexp.${NETORG}${DIR}\"> ${VERSION} </a></td>" >> $i
+					echo "                <td><a href=\"https://notesalexp.${NETORG}${DIR}\"> ${VERSION} </a></td>" >> $i
 					else
-					echo "                <td class=\"hrecord\"><a href=\"http://notesalexp.${NETORG}${DIR}\"> ${VERSION} </a></td>" >> $i
+					echo "                <td class=\"hrecord\"><a href=\"https://notesalexp.${NETORG}${DIR}\"> ${VERSION} </a></td>" >> $i
 					fi
 #					echo "                <td> ${VERSION} </td>" >> $i
 			fi
@@ -281,7 +285,7 @@ for i in $NET_INDEX_TMP $ORG_INDEX_TMP; do
 		fi
 		DSC=$(find ${REPREPRO_DIR}/source -name "${SOURCE}_*.dsc" | sed 1q)
 		case ${l} in
-			qcad|aegisub|kvirc|clementine|deadbeef|goaccess|ppastats|gimp*|llpp|solvespace|librecad)
+			balsa|gscan2pdf|pinta|mypaint|freecad*|qcad|tesseract*|aegisub|kvirc|clementine|deadbeef|goaccess|ppastats|gimp*|scantailor|llpp|solvespace|librecad)
 			DSCVERSION=$(echo ${DSC} | sed 's/.*_//g'| rev | cut -c 7- | rev)
 			;;
 			*)
@@ -293,7 +297,7 @@ for i in $NET_INDEX_TMP $ORG_INDEX_TMP; do
 			then
 				echo "                <td class=\"hrecord\">  </td>" >> $i
 			else
-				echo "                <td><a href=\"http://notesalexp.${NETORG}${DSCFILE}\"> ${DSCVERSION} </a></td>" >> $i
+				echo "                <td><a href=\"https://notesalexp.${NETORG}${DSCFILE}\"> ${DSCVERSION} </a></td>" >> $i
 		fi
 		unset SOURCE DEB_HOMEPAGE 
 		echo "            </tr>" >> $i
@@ -393,7 +397,7 @@ cat >> $i << EOF
 </p>
 -->
 <p>
-Blog:   <a href="http://notesalexp.org/blog/">http://notesalexp.org/blog/</a>
+Blog:   <a href="https://notesalexp.org/html/blog/">https://notesalexp.org/html/blog/</a>
 </p>
 EOF
 done
@@ -404,7 +408,7 @@ cat >> $i << EOF
 </p>
 -->
 <p>
-Блог:   <a href="http://notesalexp.org/blog/">http://notesalexp.org/blog/</a>
+Блог:   <a href="https://notesalexp.org/html/blog/">https://notesalexp.org/html/blog/</a>
 </p>
 EOF
 done
@@ -436,7 +440,7 @@ cat >> $i << EOF
 <table width="100%" border="0px">
     <tbody>
         <tr>
-            <td align="center"><font size="2">© Alexander Pozdnyakov, 2010–2016</font></td>
+            <td align="center"><font size="2">© Alexander Pozdnyakov, 2010–2018</font></td>
         </tr>
     </tbody>
 </table>
@@ -450,7 +454,7 @@ cat >> $i << EOF
 <table width="100%" border="0px">
     <tbody>
         <tr>
-            <td align="center"><font size="2">© Александр Поздняков, 2010–2016</font></td>
+            <td align="center"><font size="2">© Александр Поздняков, 2010–2018</font></td>
         </tr>
     </tbody>
 </table>
