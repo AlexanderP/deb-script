@@ -1,0 +1,6 @@
+[test]
+fqdn = ppa.launchpad.net
+method = ftp
+incoming = ~alex-p/test/ubuntu/
+login = anonymous
+allow_unsigned_uploads = 0

@@ -1,0 +1,138 @@
+
+# Codenames for Debian suites according to their alias. Update these when
+# needed.
+UNSTABLE_CODENAME="sid"
+TESTING_CODENAME="stretch"
+STABLE_CODENAME="jessie"
+STABLE_BACKPORTS_SUITE="$STABLE_CODENAME-backports"
+OLDSTABLE_CODENAME="wheezy"
+OLDSTABLE_BACKPORTS_SUITE="$OLDSTABLE_CODENAME-backports"
+#APTGETOPT=("--allow-unauthenticated")
+APTCACHEHARDLINK=no   #для tmpfs
+# List of Debian suites.
+DEBIAN_SUITES=("wheezy" "jessie" "stretch" "buster" "sid" )
+
+# List of Ubuntu suites. Update these when needed.
+UBUNTU_SUITES=("trusty" "precise" "xenial" "artful" "bionic")
+
+# Mirrors to use. Update these to your preferred mirror.
+#DEBIAN_MIRROR="ftp.us.debian.org"
+#UBUNTU_MIRROR="mirrors.kernel.org"
+UBUNTU_MIRROR="archive.ubuntu.com"
+DEBIAN_MIRROR="ftp.debian.org"
+#DEBIAN_MIRROR="ftp.ru.debian.org"
+
+# Optionally use the changelog of a package to determine the suite to use if
+# none set.
+if [ -z "${DIST}" ] && [ -r "debian/changelog" ]; then
+    DIST=$(dpkg-parsechangelog | awk '/^Distribution: / {print $2}')
+    # Use the unstable suite for certain suite values.
+    if $(echo "experimental UNRELEASED" | grep -q $DIST); then
+        DIST="$UNSTABLE_CODENAME"
+    fi
+    # Use the stable suite for stable-backports.
+    if $(echo "$STABLE_BACKPORTS_SUITE" | grep -q $DIST); then
+        DIST="$STABLE"
+    fi
+fi
+
+case ${DIST} in
+	precise) 	USERUNSHM=no ;;
+	*) 			USERUNSHM=yes ;;
+esac
+
+# Optionally set a default distribution if none is used. Note that you can set
+# your own default (i.e. ${DIST:="unstable"}).
+: ${DIST:="$(lsb_release --short --codename)"}
+
+# Optionally change Debian release states in $DIST to their names.
+case "$DIST" in
+    unstable)
+        DIST="$UNSTABLE_CODENAME"
+        ;;
+    testing)
+        DIST="$TESTING_CODENAME"
+        ;;
+    stable)
+        DIST="$STABLE_CODENAME"
+        ;;
+    oldstable)
+    DIST="$OLDSTABLE_CODENAME"
+    ;;
+esac
+
+# Optionally set the architecture to the host architecture if none set. Note
+# that you can set your own default (i.e. ${ARCH:="i386"}).
+: ${ARCH:="$(dpkg --print-architecture)"}
+
+NAME="$DIST"
+if [ -n "${ARCH}" ]; then
+    NAME="$NAME-$ARCH"
+    DEBOOTSTRAPOPTS=("--arch" "$ARCH" "${DEBOOTSTRAPOPTS[@]}")
+fi
+BASETGZ="${HOME}/pbuilder/$NAME-base.tgz"
+# Optionally, set BASEPATH (and not BASETGZ) if using cowbuilder
+# BASEPATH="/home/alex/pbuilder/$NAME/base.cow/"
+DISTRIBUTION="$DIST"
+BUILDRESULT="${HOME}/pbuilder/$NAME/result/"
+APTCACHE="${HOME}/pbuilder/$NAME/aptcache/"
+BUILDPLACE="${HOME}/pbuilder/build/"
+#BINDMOUNTS="/var/cache/archive"
+
+if $(echo ${DEBIAN_SUITES[@]} | grep -q $DIST); then
+    # Debian configuration
+    MIRRORSITE="http://$DEBIAN_MIRROR/debian/"
+    COMPONENTS="main contrib non-free"
+    # This is for enabling backports for the Debian stable suite.
+    #if $(echo "squeeze" | grep -q $DIST); then
+    #    #EXTRAPACKAGES="$EXTRAPACKAGES debian-backports-keyring"
+    #    OTHERMIRROR="$OTHERMIRROR | deb http://backports.debian.org/debian-backports $OLDSTABLE_BACKPORTS_SUITE $COMPONENTS"
+    #fi
+    #if $(echo "squeeze" | grep -q $DIST); then
+    #    EXTRAPACKAGES="$EXTRAPACKAGES debian-backports-keyring"
+    #    OTHERMIRROR="$OTHERMIRROR | deb http://backports.debian.org/debian-backports $STABLE_BACKPORTS_SUITE $COMPONENTS"
+    #fi
+    if $(echo "wheezy" | grep -q $DIST); then
+        EXTRAPACKAGES="$EXTRAPACKAGES deb-multimedia-keyring"
+        OTHERMIRROR="$OTHERMIRROR | deb http://www.deb-multimedia.org $DIST main"
+    fi
+    if $(echo "stretch" | grep -q $DIST); then
+        EXTRAPACKAGES="$EXTRAPACKAGES deb-multimedia-keyring"
+        OTHERMIRROR="$OTHERMIRROR | deb http://www.deb-multimedia.org $DIST main"
+    fi
+    if $(echo "jessie" | grep -q $DIST); then
+        EXTRAPACKAGES="$EXTRAPACKAGES deb-multimedia-keyring"
+        OTHERMIRROR="$OTHERMIRROR | deb http://www.deb-multimedia.org $DIST main"
+    fi
+    if $(echo "sid" | grep -q $DIST); then
+        EXTRAPACKAGES="$EXTRAPACKAGES deb-multimedia-keyring"
+        OTHERMIRROR="$OTHERMIRROR | deb http://www.deb-multimedia.org $DIST main"
+    fi
+    if $(echo "buster" | grep -q $DIST); then
+        EXTRAPACKAGES="$EXTRAPACKAGES deb-multimedia-keyring"
+        OTHERMIRROR="$OTHERMIRROR | deb http://www.deb-multimedia.org $DIST main"
+    fi
+    
+elif $(echo ${UBUNTU_SUITES[@]} | grep -q $DIST); then
+    # Ubuntu configuration
+    MIRRORSITE="http://$UBUNTU_MIRROR/ubuntu/"
+    COMPONENTS="main restricted universe multiverse"
+    if $(echo "trusty" | grep -q $DIST); then
+	OTHERMIRROR="deb http://$UBUNTU_MIRROR/ubuntu/ $DIST-updates $COMPONENTS | deb http://$UBUNTU_MIRROR/ubuntu/ $DIST-backports $COMPONENTS"
+    fi
+    if $(echo "karmic" | grep -q $DIST); then
+	OTHERMIRROR="deb http://$UBUNTU_MIRROR/ubuntu/ $DIST-updates $COMPONENTS | deb http://$UBUNTU_MIRROR/ubuntu/ $DIST-backports $COMPONENTS"
+    fi
+    if $(echo "lucid" | grep -q $DIST); then
+	OTHERMIRROR="deb http://$UBUNTU_MIRROR/ubuntu/ $DIST-updates $COMPONENTS | deb http://$UBUNTU_MIRROR/ubuntu/ $DIST-backports $COMPONENTS"
+    fi
+    if $(echo "maverick" | grep -q $DIST); then
+	OTHERMIRROR="deb http://$UBUNTU_MIRROR/ubuntu/ $DIST-updates $COMPONENTS | deb http://$UBUNTU_MIRROR/ubuntu/ $DIST-backports $COMPONENTS"
+    fi
+    if $(echo "precise" | grep -q $DIST); then
+	OTHERMIRROR="deb http://$UBUNTU_MIRROR/ubuntu/ $DIST-updates $COMPONENTS | deb http://$UBUNTU_MIRROR/ubuntu/ $DIST-backports $COMPONENTS"
+    fi
+else
+    echo "Unknown distribution: $DIST"
+    exit 1
+fi
